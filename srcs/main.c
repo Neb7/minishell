@@ -6,20 +6,13 @@
 /*   By: benpicar <benpicar@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 14:44:32 by benpicar          #+#    #+#             */
-/*   Updated: 2025/03/14 14:40:39 by benpicar         ###   ########.fr       */
+/*   Updated: 2025/03/14 15:17:27 by benpicar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 int	g_signal[4];
-
-static int	ft_isspace(int c)
-{
-	if ((char)c == ' ' || ((char)c < 13 && (char)c > 8))
-		return (8192);
-	return (0);
-}
 
 static bool	ft_only_space(char *str)
 {
