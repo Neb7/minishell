@@ -156,7 +156,10 @@ ${OBJS_DIR}:
 				@mkdir -p ${OBJS_DIR}${DIR_PAR}${DIR_PAR_EXP}
 				@mkdir -p ${OBJS_DIR}${DIR_PAR}${DIR_PAR_HERE_DOC}
 
-${LIB_A}:
+${LIBFT}:		
+				@git clone https://github.com/Neb7/libft.git $@
+
+${LIB_A}:		${LIBFT}
 				@echo "${BLUE}'libft.a' is compiling... 🔥${RESET}"
 				@make -sC ${LIBFT}
 

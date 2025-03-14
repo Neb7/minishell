@@ -3,7 +3,7 @@ a.out
 *.o
 *.swp
 *.so
-*/libft.a
+/libft/
 test*
 minishell 
 .vscode
