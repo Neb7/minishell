@@ -6,7 +6,7 @@
 /*   By: llemmel <llemmel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 15:15:13 by llemmel           #+#    #+#             */
-/*   Updated: 2025/03/09 16:41:28 by llemmel          ###   ########.fr       */
+/*   Updated: 2025/03/10 13:42:36 by llemmel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,10 +40,12 @@ char	*get_var_name(char *value, size_t *name_size)
 bool	check_and_do_expand_var(t_shell shell, char **value, \
 	size_t *i, bool in_dquote)
 {
-	if (!in_dquote || (*value)[*i + 1] != '\"')
+	if (!in_dquote || ((*value)[*i + 1] != '\"' && (*value)[*i + 1] != '\''))
+	{
 		if (!expand_var(shell, value, i, in_dquote))
 			return (false);
-	if ((*value)[*i])
+	}
+	else
 		(*i)++;
 	return (true);
 }

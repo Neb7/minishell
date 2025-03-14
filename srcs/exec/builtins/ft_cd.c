@@ -6,7 +6,7 @@
 /*   By: benpicar <benpicar@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 15:04:35 by benpicar          #+#    #+#             */
-/*   Updated: 2025/03/05 13:28:25 by benpicar         ###   ########.fr       */
+/*   Updated: 2025/03/13 14:05:16 by benpicar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ static bool	ft_cd_edit_oldpwd(t_list **lst, char **tmp);
  * @param	com Struct of our command
  * @return	0 all good, 1 have error
  */
-int	ft_cd(t_shell *shell, t_command *com)
+int	ft_cd(t_shell *shell, t_command *com, bool in_fork)
 {
 	bool	edit_prompte;
 	char	*home;
@@ -46,11 +46,10 @@ int	ft_cd(t_shell *shell, t_command *com)
 	if (!ft_cd_update_pwd(shell, &edit_prompte))
 		return (ft_error_malloc(shell), 1);
 	if (edit_prompte)
-	{
-		free(shell->prompte);
-		shell->prompte = ft_init_prompt(" $> ");
-	}
+		ft_cd_init_prompte(shell);
 	ft_sup_here_doc(com);
+	if (in_fork)
+		ft_free_child(shell, EXIT_SUCCESS);
 	return (0);
 }
 

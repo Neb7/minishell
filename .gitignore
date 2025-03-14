@@ -1,0 +1,12 @@
+a.out
+*.a
+*.o
+*.swp
+*.so
+*/libft.a
+test*
+minishell 
+.vscode
+*.sup
+--tool=helgrind
+/minishell_tester/

@@ -6,7 +6,7 @@
 /*   By: llemmel <llemmel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 15:02:08 by llemmel           #+#    #+#             */
-/*   Updated: 2025/03/05 17:17:13 by llemmel          ###   ########.fr       */
+/*   Updated: 2025/03/10 14:31:21 by llemmel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
  * @param	value The value of the argument to add.
  * @return	true if the argument was added successfully, false otherwise.
  */
-static bool	add_arg(char ***tab, char *value)
+bool	add_arg(char ***tab, char *value)
 {
 	char	**new_tab;
 	size_t	tab_size;
@@ -56,7 +56,7 @@ static bool	add_arg(char ***tab, char *value)
  * @return	true if the command name was added successfully, false otherwise.
  * 			If an error occurs, the error flag is set to true.
  */
-static bool	add_cmd_name(t_command *command, t_token *token, bool *error)
+bool	add_cmd_name(t_command *command, t_token *token, bool *error)
 {
 	if (!is_builtins(token->value))
 	{
@@ -85,7 +85,7 @@ static bool	add_cmd_name(t_command *command, t_token *token, bool *error)
  * @return	true if the file was added successfully, false otherwise.
  * 			If an error occurs, the error flag is set to true.
  */
-static bool	add_redirection(t_command *command, t_token *tokens, \
+bool	add_redirection(t_command *command, t_token *tokens, \
 		size_t *i, bool *err)
 {
 	t_list	*node;
@@ -115,6 +115,19 @@ static bool	add_redirection(t_command *command, t_token *tokens, \
 	return (true);
 }
 
+bool	check_empty_command(t_shell *shell, size_t i, size_t *nb_empty)
+{
+	*nb_empty = 0;
+	while (shell->tokens[i].value && shell->tokens[i].type != TYPE_PIPE)
+	{
+		if (shell->tokens[i].type != TYPE_EMPTY)
+			return (false);
+		*nb_empty += 1;
+		i++;
+	}
+	return (true);
+}
+
 /**
  * @brief	Get a new command node and add it to the node_tab.
  * 
@@ -132,28 +145,23 @@ static bool	add_redirection(t_command *command, t_token *tokens, \
 bool	get_simple_command(t_shell *shell, size_t *i, bool *error)
 {
 	t_command	*cmd;
+	size_t		nb_empty;
 
 	cmd = create_command(NULL);
 	if (!cmd)
 		return (ret_false_error(error, NULL));
-	shell->c_command = cmd;
-	while (shell->tokens[*i].value && shell->tokens[*i].type != TYPE_PIPE)
+	if (check_empty_command(shell, *i, &nb_empty))
 	{
-		if (shell->tokens[*i].type == TYPE_COMMAND \
-			&& !add_cmd_name(cmd, &shell->tokens[*i], error))
-			return (ret_false_error(error, cmd));
-		else if (shell->tokens[*i].type == TYPE_ARG \
-			&& !add_arg(&cmd->args, shell->tokens[*i].value))
-			return (ret_false_error(error, cmd));
-		else if (is_redirection(shell->tokens[*i]) \
-			&& !add_redirection(cmd, shell->tokens, i, error))
-			return (ret_false_error(error, cmd));
-		if (shell->tokens[*i].value)
-			*i += 1;
+		*i += nb_empty;
+		return (fill_empty_command(shell, cmd, error));
 	}
+	shell->c_command = cmd;
+	if (!fill_command(shell, cmd, i, error))
+		return (ret_false_error(error, cmd));
 	if (!open_files(shell, cmd))
 		return (ret_false_error(error, cmd));
-	if (*error == false)
-		add_node(&shell->node_tab, create_node(cmd, NULL, NODE_COMMAND), error);
+	if (!*error)
+		add_node(&shell->node_tab, \
+			create_node(cmd, NULL, NODE_COMMAND), error);
 	return (!*error);
 }

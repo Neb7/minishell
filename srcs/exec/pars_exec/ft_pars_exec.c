@@ -6,7 +6,7 @@
 /*   By: benpicar <benpicar@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 18:38:28 by benpicar          #+#    #+#             */
-/*   Updated: 2025/03/09 15:12:35 by benpicar         ###   ########.fr       */
+/*   Updated: 2025/03/14 14:41:09 by benpicar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,18 @@
  */
 void	ft_pars_exec(t_shell *shell, t_command *com)
 {
+	if (!com->args || shell->nb_command > 1)
+	{
+		ft_command(shell, com);
+		return ;
+	}
 	if (com->path == NULL && !ft_strncmp(com->args[0], "cd", 3))
-		ft_cd(shell, com);
+		ft_cd(shell, com, false);
 	else if (!com->path && !ft_strncmp(com->args[0], "export", 7) && \
 	com->args[1])
-		ft_export(shell, com);
+		ft_export(shell, com, false);
 	else if (com->path == NULL && !ft_strncmp(com->args[0], "unset", 6))
-		ft_unset(shell, com);
+		ft_unset(shell, com, false);
 	else if (shell->nb_command == 1 && !ft_strncmp(com->args[0], "exit", 5))
 		ft_exit_spe(shell, com);
 	else
@@ -46,7 +51,16 @@ void	ft_command(t_shell *shell, t_command *com)
 	if (shell->pid[shell->idx_pid] < 0)
 		return ;
 	else if (shell->pid[shell->idx_pid] == 0)
+	{
+		if (com->path == NULL && !ft_strncmp(com->args[0], "cd", 3))
+			ft_cd(shell, com, true);
+		else if (!com->path && !ft_strncmp(com->args[0], "export", 7) && \
+		com->args[1])
+			ft_export(shell, com, true);
+		else if (com->path == NULL && !ft_strncmp(com->args[0], "unset", 6))
+			ft_unset(shell, com, true);
 		ft_child(shell, com);
+	}
 }
 
 /**
@@ -58,6 +72,7 @@ void	ft_command(t_shell *shell, t_command *com)
 void	ft_child(t_shell *shell, t_command *com)
 {
 	ft_init_sig(SIGPIPE, ft_ges);
+	ft_check_args_null(shell, com);
 	if (!ft_redir_check(com, shell))
 		exit(1);
 	if (com->path == NULL && !ft_strncmp(com->args[0], "echo", 5))
@@ -67,7 +82,7 @@ void	ft_child(t_shell *shell, t_command *com)
 	else if (com->path == NULL && !ft_strncmp(com->args[0], "env", 4))
 		ft_env(shell);
 	else if (com->path == NULL && !ft_strncmp(com->args[0], "export", 7))
-		ft_export(shell, com);
+		ft_export(shell, com, true);
 	else if (ft_strlen(com->args[0]) >= 10 && !com->args[1] && \
 	!ft_strncmp(com->path + ft_strlen(com->args[0]) - 10, "/minishell", 11))
 		ft_piped_mini(com, shell);

@@ -6,7 +6,7 @@
 /*   By: benpicar <benpicar@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 14:34:43 by benpicar          #+#    #+#             */
-/*   Updated: 2025/03/09 16:00:50 by benpicar         ###   ########.fr       */
+/*   Updated: 2025/03/13 14:06:25 by benpicar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ static void	ft_export_wrong_arg(char *arg, int *ret);
  * @param	in_fork True if we're in a child process
  * @return	int 
  */
-int	ft_export(t_shell *shell, t_command *com)
+int	ft_export(t_shell *shell, t_command *com, bool in_fork)
 {
 	int	ret;
 
@@ -34,6 +34,8 @@ int	ft_export(t_shell *shell, t_command *com)
 		ft_export_no_arg(shell->global_var, ft_nbvar(shell->global_var), shell);
 	else
 		ft_export_arg(shell->global_var, com, shell, &ret);
+	if (in_fork)
+		ft_free_child(shell, EXIT_SUCCESS);
 	return (ret);
 }
 

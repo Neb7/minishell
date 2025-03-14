@@ -6,7 +6,7 @@
 /*   By: benpicar <benpicar@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 14:37:16 by benpicar          #+#    #+#             */
-/*   Updated: 2025/03/09 18:13:25 by benpicar         ###   ########.fr       */
+/*   Updated: 2025/03/10 14:26:05 by benpicar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,4 +72,17 @@ void	ft_error_execve(t_shell *shell, t_command *com)
 			ft_error_child_last(com, &ret);
 	}
 	ft_free_child(shell, ret);
+}
+
+void	ft_check_args_null(t_shell *shell, t_command *com)
+{
+	if (!com->args || !com->args[0])
+	{
+		if (!com->type_empty && !com->output_file && !com->input_file)
+		{
+			ft_putstr_fd("minishell: : command not found\n", STDERR_FILENO);
+			ft_free_child(shell, EXIT_FAILURE);
+		}
+		ft_free_child(shell, EXIT_SUCCESS);
+	}
 }

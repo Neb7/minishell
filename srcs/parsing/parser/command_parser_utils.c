@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   command_parser_utils.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: benpicar <benpicar@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: capi <capi@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 15:53:55 by llemmel           #+#    #+#             */
-/*   Updated: 2025/03/09 18:05:04 by benpicar         ###   ########.fr       */
+/*   Updated: 2025/03/10 01:32:02 by capi             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,9 +148,3 @@ bool	open_files(t_shell *shell, t_command *command)
 		return (false);
 	return (true);
 }
-	// if (file->fd == -1)
-		// {
-		// 	shell->last_exit_status = 1;
-		// 	return (ft_putstr_fd("minishell: ", STDERR_FILENO), \
-		// 		perror(file->name), close_files(command->input_file), false);
-		// }

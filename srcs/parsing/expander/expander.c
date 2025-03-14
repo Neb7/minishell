@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expander.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: benpicar <benpicar@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: llemmel <llemmel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 16:32:05 by llemmel           #+#    #+#             */
-/*   Updated: 2025/03/09 18:05:30 by benpicar         ###   ########.fr       */
+/*   Updated: 2025/03/10 13:40:41 by llemmel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,11 @@ bool	expand_vars(t_shell shell, char **value, bool skip_quote)
 				in_dquote = !in_dquote;
 			if (!in_dquote && skip_quote && (*value)[i] == '\'')
 				skip_simple_quote(*value, &i);
-			else if ((*value)[i] == '$' \
-				&& !check_and_do_expand_var(shell, value, &i, in_dquote))
-				return (false);
+			else if ((*value)[i] == '$')
+			{
+				if (!check_and_do_expand_var(shell, value, &i, in_dquote))
+					return (false);
+			}
 			else if ((*value)[i])
 				i++;
 		}
@@ -104,8 +106,6 @@ bool	expand_token(t_shell shell, char **value)
  */
 static bool	expand_command(t_shell shell, t_token *token)
 {
-	if (!expand_token(shell, &token->value))
-		return (false);
 	token->raw_value = ft_strdup(token->value);
 	if (!token->raw_value)
 		return (perror("minishell"), false);
@@ -125,7 +125,7 @@ static bool	expand_command(t_shell shell, t_token *token)
  * @param shell A pointer to the shell structure containing tokens.
  * @return true if all expansions are successful, false if an error occurs.
  */
-bool	expander(t_shell *shell)
+bool	expander_command(t_shell *shell)
 {
 	size_t	i;
 
@@ -135,15 +135,6 @@ bool	expander(t_shell *shell)
 		if (shell->tokens[i].type == TYPE_COMMAND \
 			&& !expand_command(*shell, &shell->tokens[i]))
 			return (false);
-		else if (shell->tokens[i].type == TYPE_ARG \
-			&& !expand_token(*shell, &shell->tokens[i].value))
-			return (false);
-		else if (shell->tokens[i].type == TYPE_FILE \
-			&& i > 0 && shell->tokens[i - 1].type != TYPE_HERE_DOC)
-		{
-			if (!expand_token(*shell, &shell->tokens[i].value))
-				return (false);
-		}
 		i++;
 	}
 	return (true);

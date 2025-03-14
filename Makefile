@@ -52,7 +52,7 @@ SRC_EXE_PAR	= ft_execute_utils.c \
 DIR_PAR		= parsing/
 SRC_PAR		= parse_command_line.c \
 			  checker.c \
-			  free.c \
+			  free.c
 
 
 DIR_PAR_MAS	= make_ast/
@@ -62,6 +62,7 @@ SRC_PAR_MAS	= make_ast.c \
 DIR_PAR_PAR	= parser/
 SRC_PAR_PAR	= command_parser.c \
 			  command_parser_utils.c \
+			  command_parser_utils_2.c \
 			  parser_pipe.c \
 			  parser_utils.c \
 			  parser.c
@@ -74,6 +75,7 @@ SRC_PAR_HERE_DOC	= here_doc.c \
 DIR_PAR_TOK	= tokenizer/
 SRC_PAR_TOK	= check_syntax_error.c \
 			  tokenizer_utils.c \
+			  tokenizer_utils_2.c \
 			  clean_token.c \
 			  tokenizer.c
 

@@ -6,7 +6,7 @@
 /*   By: llemmel <llemmel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 18:38:26 by llemmel           #+#    #+#             */
-/*   Updated: 2025/03/06 15:30:31 by llemmel          ###   ########.fr       */
+/*   Updated: 2025/03/10 13:57:20 by llemmel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,9 +49,11 @@ static bool	wait_child_here_doc(int pid)
 		waitpid(pid, NULL, 0);
 	}
 	ft_wait_parent(1024);
-	write(STDIN_FILENO, "\n", 1);
 	if (g_signal[1] == 123)
+	{
+		write(STDOUT_FILENO, "\n", 1);
 		return (false);
+	}
 	return (true);
 }
 

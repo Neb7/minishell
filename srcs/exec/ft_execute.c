@@ -6,7 +6,7 @@
 /*   By: benpicar <benpicar@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 16:31:17 by benpicar          #+#    #+#             */
-/*   Updated: 2025/03/05 15:55:42 by benpicar         ###   ########.fr       */
+/*   Updated: 2025/03/10 14:03:07 by benpicar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,6 @@
  */
 static void	ft_check_node(t_shell *shell, t_ast_node *tmp, bool last_com)
 {
-	t_command	*com;
-
-	com = (t_command *)tmp->data;
-	if (!com->args || !com->args[0])
-		return ((void)sup_here_doc(com), ft_lstclear(&com->input_file, \
-		free_file), ft_lstclear(&com->output_file, free_file));
 	if (last_com)
 		ft_pars_exec_last(shell, tmp->data);
 	else

@@ -6,7 +6,7 @@
 /*   By: benpicar <benpicar@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 18:51:31 by benpicar          #+#    #+#             */
-/*   Updated: 2025/03/03 15:40:08 by benpicar         ###   ########.fr       */
+/*   Updated: 2025/03/11 15:16:51 by benpicar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ void	ft_loop_mini(t_shell *shell)
 {
 	while (g_signal[1])
 		ft_strlen(shell->prompte);
+	waitpid(shell->pid[shell->idx_pid - 1], &shell->status, 0);
 	if (WIFEXITED(shell->status))
 		if (shell->idx_pid == (int)shell->nb_command)
 			if (shell->pid[shell->idx_pid - 1] != 0)

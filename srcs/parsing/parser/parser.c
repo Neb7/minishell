@@ -6,7 +6,7 @@
 /*   By: capi <capi@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/17 16:33:55 by llemmel           #+#    #+#             */
-/*   Updated: 2025/03/03 21:32:14 by capi             ###   ########.fr       */
+/*   Updated: 2025/03/10 01:25:46 by capi             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,13 @@ bool	parser(t_shell *shell)
 		return (perror("minishell"), free(shell->node_tab), false);
 	while (shell->tokens[i].value)
 	{
+		if (!shell->tokens[i].value)
+			break ;
 		if (!get_simple_command(shell, &i, &error) \
 			|| error == true)
 			return (false);
+		if (!shell->tokens[i].value)
+			break ;
 		if (!get_pipe(shell, &i, &error) || error == true)
 			return (false);
 	}

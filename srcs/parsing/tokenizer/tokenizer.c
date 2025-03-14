@@ -6,40 +6,36 @@
 /*   By: llemmel <llemmel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 14:14:30 by llemmel           #+#    #+#             */
-/*   Updated: 2025/03/06 12:49:11 by llemmel          ###   ########.fr       */
+/*   Updated: 2025/03/10 14:31:37 by llemmel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.h"
 
 /**
- * @brief	Get the next token of the command line.
+ * @brief	The part 1 of add_token_type
  * 
- * @param	cmd_line The command line to tokenize.
  * @param	tokens A pointer to the token array.
- * @param	error A pointer to a boolean to set to true if an error occured.
- * @return	The command line directly after the token. 
+ * @param	i The index of the token to check.
+ * @return	true if the type has been added, false otherwise.
  */
-static char	*get_next_token(char *cmd_line, t_token **tokens, bool *error)
+static bool	add_simple_type(t_token *token)
 {
-	t_token	new_token;
-	size_t	token_size;
-
-	token_size = get_token_size(cmd_line);
-	if (token_size == 0)
-	{
-		**tokens = (t_token){0};
-		return (cmd_line + 1);
-	}
-	new_token.type = TYPE_UNKNOW;
-	new_token.value = ft_substr(cmd_line, 0, token_size);
-	if (!new_token.value)
-		return (perror("minishell"), *error = true, NULL);
-	new_token.raw_value = NULL;
-	add_token(tokens, new_token, error);
-	if (*error)
-		return (free(new_token.value), NULL);
-	return (cmd_line + token_size);
+	if (!token || !token->value)
+		return (false);
+	if (token->value[0] == '|')
+		token->type = TYPE_PIPE;
+	else if (!ft_strncmp(token->value, ">", 2))
+		token->type = TYPE_REDIRECT_OUTPUT;
+	else if (!ft_strncmp(token->value, "<", 2))
+		token->type = TYPE_REDIRECT_INPUT;
+	else if (!ft_strncmp(token->value, ">>", 3))
+		token->type = TYPE_REDIRECT_APPEND;
+	else if (!ft_strncmp(token->value, "<<", 3))
+		token->type = TYPE_HERE_DOC;
+	else
+		return (false);
+	return (true);
 }
 
 /**
@@ -53,6 +49,11 @@ static bool	check_command(t_token **tokens, size_t i)
 {
 	while (i > 0)
 	{
+		if ((*tokens)[i].type == TYPE_EMPTY)
+		{
+			i--;
+			continue ;
+		}
 		if ((*tokens)[i].type == TYPE_PIPE)
 			return (false);
 		else if ((*tokens)[i].type == TYPE_COMMAND)
@@ -62,30 +63,6 @@ static bool	check_command(t_token **tokens, size_t i)
 	if ((*tokens)[i].type == TYPE_COMMAND)
 		return (true);
 	return (false);
-}
-
-/**
- * @brief	The part 1 of add_token_type
- * 
- * @param	tokens A pointer to the token array.
- * @param	i The index of the token to check.
- * @return	true if the type has been added, false otherwise.
- */
-static bool	add_simple_type(t_token **tokens, size_t i)
-{
-	if (*(*tokens)[i].value == '|')
-		(*tokens)[i].type = TYPE_PIPE;
-	else if (!ft_strncmp((*tokens)[i].value, ">", 2))
-		(*tokens)[i].type = TYPE_REDIRECT_OUTPUT;
-	else if (!ft_strncmp((*tokens)[i].value, "<", 2))
-		(*tokens)[i].type = TYPE_REDIRECT_INPUT;
-	else if (!ft_strncmp((*tokens)[i].value, ">>", 3))
-		(*tokens)[i].type = TYPE_REDIRECT_APPEND;
-	else if (!ft_strncmp((*tokens)[i].value, "<<", 3))
-		(*tokens)[i].type = TYPE_HERE_DOC;
-	else
-		return (false);
-	return (true);
 }
 
 /**
@@ -100,25 +77,57 @@ static void	add_token_type(t_token **tokens)
 	i = 0;
 	while ((*tokens)[i].value)
 	{
-		if (add_simple_type(tokens, i))
+		if ((*tokens)[i].type != TYPE_UNKNOW || (*tokens)[i].type == TYPE_EMPTY)
 		{
 			i++;
 			continue ;
 		}
-		else if (i && ((*tokens)[i - 1].type == TYPE_REDIRECT_INPUT
-			|| (*tokens)[i - 1].type == TYPE_REDIRECT_OUTPUT
-			|| (*tokens)[i - 1].type == TYPE_REDIRECT_APPEND
-			|| (*tokens)[i - 1].type == TYPE_HERE_DOC))
+		else if (i && is_redirection(get_token_bf(*tokens, i - 1)))
 			(*tokens)[i].type = TYPE_FILE;
-		else if (i && (((*tokens)[i - 1].type == TYPE_COMMAND \
-			|| (*tokens)[i - 1].type == TYPE_ARG \
+		else if (i && ((get_token_bf(*tokens, i - 1).type == TYPE_COMMAND \
+			|| get_token_bf(*tokens, i - 1).type == TYPE_ARG \
 			|| (check_command(tokens, i) \
-			&& (*tokens)[i - 1].type == TYPE_FILE))))
+			&& get_token_bf(*tokens, i - 1).type == TYPE_FILE))))
 			(*tokens)[i].type = TYPE_ARG;
 		else
 			(*tokens)[i].type = TYPE_COMMAND;
 		i++;
 	}
+}
+
+/**
+ * @brief	Get the next token of the command line.
+ * 
+ * @param	cmd_line The command line to tokenize.
+ * @param	tokens A pointer to the token array.
+ * @param	error A pointer to a boolean to set to true if an error occured.
+ * @return	The command line directly after the token. 
+ */
+static char	*get_next_token(t_shell *shell, char *cmd_line, \
+	t_token **tokens, bool *error)
+{
+	t_token	ltoken;
+	t_token	new_token;
+	size_t	token_size;
+
+	ltoken = get_last_token(*tokens);
+	token_size = get_token_size(cmd_line);
+	if (token_size == 0)
+	{
+		**tokens = (t_token){0};
+		return (cmd_line + 1);
+	}
+	new_token.type = TYPE_UNKNOW;
+	new_token.value = ft_substr(cmd_line, 0, token_size);
+	if (!new_token.value)
+		return (perror("minishell"), *error = true, NULL);
+	add_simple_type(&new_token);
+	if (!check_and_do_expand_token(shell, &new_token, &ltoken, error))
+		return (free(new_token.value), NULL);
+	add_token(tokens, new_token, error);
+	if (*error)
+		return (free(new_token.value), NULL);
+	return (cmd_line + token_size);
 }
 
 /**
@@ -136,7 +145,7 @@ static void	add_token_type(t_token **tokens)
  * @param	cmd_line The command line to tokenize. 
  * @return	The new token array or NULL if an error occured.
  */
-t_token	*tokenize(char *cmd_line)
+t_token	*tokenize(t_shell *shell, char *cmd_line)
 {
 	bool	error;
 	t_token	*tokens;
@@ -153,7 +162,7 @@ t_token	*tokenize(char *cmd_line)
 		cmd_line = skip_whitespaces(cmd_line);
 		if (!cmd_line || !*cmd_line)
 			break ;
-		cmd_line = get_next_token(cmd_line, &tokens, &error);
+		cmd_line = get_next_token(shell, cmd_line, &tokens, &error);
 		if (error)
 			return (free_token(tokens), NULL);
 		if (!cmd_line || !*cmd_line)

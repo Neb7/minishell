@@ -6,7 +6,7 @@
 /*   By: llemmel <llemmel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 16:06:19 by llemmel           #+#    #+#             */
-/*   Updated: 2025/03/09 16:06:20 by llemmel          ###   ########.fr       */
+/*   Updated: 2025/03/10 14:28:07 by llemmel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,10 +84,10 @@ bool	parse_command_line(t_shell *shell, const char *command_line)
 		return (free(shell->trim_command), true);
 	if (!check_quote(shell->trim_command))
 		return (free(shell->trim_command), true);
-	shell->tokens = tokenize(shell->trim_command);
+	shell->tokens = tokenize(shell, shell->trim_command);
 	if (!shell->tokens)
 		return (free_var(shell, shell->trim_command), false);
-	if (!expander(shell))
+	if (!expander_command(shell))
 		return (free_var(shell, shell->trim_command), false);
 	if (!parser(shell))
 		return (free_var(shell, shell->trim_command), false);

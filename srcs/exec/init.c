@@ -6,7 +6,7 @@
 /*   By: benpicar <benpicar@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 16:07:38 by benpicar          #+#    #+#             */
-/*   Updated: 2025/03/03 15:42:32 by benpicar         ###   ########.fr       */
+/*   Updated: 2025/03/14 14:39:21 by benpicar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ static bool	ft_add_one_lvl(t_var *var)
 	{
 		ft_putstr_fd("minishell: warnimg: shell level (", 2);
 		ft_putnbr_fd(nb_lvl + 1, 2);
-		ft_putstr_fd(") too high, resetting to 1", 2);
+		ft_putstr_fd(") too high, resetting to 1\n", 2);
 		nb_lvl = 0;
 	}
 	nb_lvl++;

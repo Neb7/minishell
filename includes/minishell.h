@@ -6,7 +6,7 @@
 /*   By: benpicar <benpicar@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 14:47:01 by benpicar          #+#    #+#             */
-/*   Updated: 2025/03/09 18:05:58 by benpicar         ###   ########.fr       */
+/*   Updated: 2025/03/13 14:38:38 by benpicar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,7 @@ typedef struct s_command
 	int		fd[2];
 	t_list	*input_file;
 	t_list	*output_file;
+	bool	type_empty;
 }	t_command;
 
 typedef enum e_node_type
@@ -157,17 +158,6 @@ void		free_command(t_command *command);
 char		*add_default_invalid_path(t_shell shell, char *cmd_name);
 char		*search_command(t_shell shell, const char *cmd_name, bool *error);
 
-/* PARSING */
-// tokenizer.c
-t_token		*tokenize(char *command_line);
-
-int			expand_tokens(t_shell *shell, t_token *tokens);
-
-int			create_node_tab(t_token *tokens, t_ast_node ***node_tab);
-int			assemble_ast(t_shell *shell, t_ast_node **node_tab);
-
-bool		sup_here_doc(t_command *command);
-
 /*init*/
 
 t_list		*ft_init_global(char **envp, ssize_t j, \
@@ -205,18 +195,20 @@ bool		ft_execute(t_shell *shell);
 
 /*ft_cd*/
 
-int			ft_cd(t_shell *shell, t_command *com);
+int			ft_cd(t_shell *shell, t_command *com, bool in_fork);
 
 /*ft_cd_utils*/
 
 char		*ft_cd_get_home(t_shell *shell);
 int			ft_len(char **array_string);
 void		ft_sup_here_doc(t_command *com);
+void		ft_cd_init_prompte(t_shell *shell);
 
 /*ft_error_child*/
 
 void		ft_handle_child(int sig, siginfo_t *info, void *context);
 void		ft_error_execve(t_shell *shell, t_command *com);
+void		ft_check_args_null(t_shell *shell, t_command *com);
 
 /*ft_execute_wait*/
 
@@ -249,12 +241,12 @@ void		ft_check_return(char *arg, t_shell *shell, ssize_t j, t_list *lst);
 
 /*ft_export*/
 
-int			ft_export(t_shell *shell, t_command *com);
+int			ft_export(t_shell *shell, t_command *com, bool in_fork);
 bool		ft_is_exist_already(char *arg, t_list *lst, int j);
 
 /*ft_unset*/
 
-int			ft_unset(t_shell *shell, t_command *com);
+int			ft_unset(t_shell *shell, t_command *com, bool in_fork);
 void		ft_del_var(void *content);
 
 /*ft_init_shell*/

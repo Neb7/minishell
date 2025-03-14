@@ -6,7 +6,7 @@
 /*   By: llemmel <llemmel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 17:27:51 by llemmel           #+#    #+#             */
-/*   Updated: 2025/03/09 16:42:11 by llemmel          ###   ########.fr       */
+/*   Updated: 2025/03/10 14:31:07 by llemmel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@
 # define UNEXPECTED_TOKEN "minishell: syntax error near unexpected token `"
 # define REDIRECTION_AT_END "syntax error near unexpected token `newline'"
 # define WARNING_HERE_DOC_EOF "minishell: warning: \
-here-document delimited by end-of-file"
+here-document delimited by end-of-file\n"
 
 typedef struct s_ast_node	t_ast_node;
 typedef struct s_file		t_file;
@@ -49,7 +49,8 @@ typedef enum e_token_type
 	TYPE_FILE,
 	TYPE_ASSIGNMENT,
 	TYPE_VAR_NAME,
-	TYPE_VAR_VALUE
+	TYPE_VAR_VALUE,
+	TYPE_EMPTY
 }	t_token_type;
 
 typedef struct s_token
@@ -90,12 +91,16 @@ char		*skip_whitespaces(char *str);
 size_t		ft_strlen_char(char *str, char c);
 size_t		get_token_size(char *cmd_line);
 void		add_token(t_token **tokens, t_token new_token, bool *error);
+t_token		get_last_token(t_token *tokens);
+t_token		get_token_bf(t_token *tokens, size_t i);
+bool		check_and_do_expand_token(t_shell *shell, t_token *new_token, \
+	t_token *ltoken, bool *error);
 
 // tokenizer/tokenizer.c
 // c un trim qui fonctionne celui la, compare a certain strtrim
 char		*ft_strtrim_llemmel(char const *s1, char const *set);
 bool		check_syntax_error(t_token *tokens);
-t_token		*tokenize(char *cmd_line);
+t_token		*tokenize(t_shell *shell, char *cmd_line);
 
 // tokenizer/debug_free.c
 void		free_token(t_token *tokens);
@@ -128,7 +133,7 @@ bool		expand_var(t_shell shell, char **value, size_t *i, bool in_quotes);
 bool		expand_quote(char **value);
 bool		expand_vars(t_shell shell, char **value, bool skip_quote);
 bool		expand_token(t_shell shell, char **value);
-bool		expander(t_shell *shell);
+bool		expander_command(t_shell *shell);
 
 /*
 					PARSER
@@ -148,8 +153,16 @@ void		add_node(t_ast_node ***node_tab, t_ast_node *new_node, bool *error);
 
 // parser/command_parser_utils.c
 bool		open_files(t_shell *shell, t_command *command);
+bool		fill_command(t_shell *shell, t_command *cmd, \
+						size_t *i, bool *error);
+bool		fill_empty_command(t_shell *shell, t_command *cmd, bool *error);
 
 // parser/command_parser.c
+bool		add_arg(char ***tab, char *value);
+bool		add_cmd_name(t_command *command, \
+							t_token *token, bool *error);
+bool		add_redirection(t_command *command, t_token *tokens, \
+							size_t *i, bool *err);
 bool		get_simple_command(t_shell *shell, size_t *i, bool *error);
 // parser/parser_pipe.c
 bool		get_pipe(t_shell *shell, size_t *i, bool *error);

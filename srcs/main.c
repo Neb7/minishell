@@ -3,16 +3,37 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: llemmel <llemmel@student.42.fr>            +#+  +:+       +#+        */
+/*   By: benpicar <benpicar@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 14:44:32 by benpicar          #+#    #+#             */
-/*   Updated: 2025/03/06 15:49:12 by llemmel          ###   ########.fr       */
+/*   Updated: 2025/03/14 14:40:39 by benpicar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 int	g_signal[4];
+
+static int	ft_isspace(int c)
+{
+	if ((char)c == ' ' || ((char)c < 13 && (char)c > 8))
+		return (8192);
+	return (0);
+}
+
+static bool	ft_only_space(char *str)
+{
+	size_t	i;
+
+	i = 0;
+	while (str[i] != '\0')
+	{
+		if (!ft_isspace(str[i]))
+			return (false);
+		i++;
+	}
+	return (true);
+}
 
 static void	ft_reset_sig(t_shell *shell)
 {
@@ -32,7 +53,7 @@ void	ft_loop(t_shell *shell)
 	{
 		ft_reset_sig(shell);
 		shell->input = readline(shell->prompte);
-		if (shell->input)
+		if (shell->input && !ft_only_space(shell->input))
 			add_history(shell->input);
 		if (!shell->input)
 			return (rl_clear_history(),
@@ -65,11 +86,12 @@ int	main(int argc, char **argv, char **envp)
 
 	ft_init_sig(SIGUSR2, ft_ges);
 	ft_init_sig(SIGUSR1, ft_ges_in_exe);
-	if (argc != 1 && ft_strncmp(argv[0], "./minishell", 12))
+	if (argc != 1)
 		return (ft_putstr_fd("Error\nUsage: ./minishell\n", 2), EXIT_FAILURE);
 	shell = ft_acces_shell(envp);
 	if (!shell)
 		return (EXIT_FAILURE);
 	ft_loop(shell);
+	(void)argv;
 	return (ft_exit(shell, 0), 0);
 }
