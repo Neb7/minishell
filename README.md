@@ -11,7 +11,7 @@ git clone https://github.com/Neb7/libft.git minishell/libft
 
 # Checkout a specific commit of libft
 cd minishell/libft
-git checkout bda590a
+git checkout f06d488
 
 # Return to the minishell root directory
 cd ../..
