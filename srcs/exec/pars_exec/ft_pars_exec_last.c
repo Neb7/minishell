@@ -21,6 +21,7 @@ static bool	ft_bultin_cheld_last(t_command *com, t_shell *shell)
 		ft_export(shell, com, true);
 	else if (com->path == NULL && !ft_strncmp(com->args[0], "unset", 6))
 		ft_unset(shell, com, true);
+	return (true);
 }
 
 /**
